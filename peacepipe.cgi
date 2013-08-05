@@ -33,7 +33,9 @@ if [ "${QUERY}x" != "x" ]; then
 		QUERY="${QUERY%\&*}"
 
 		case "$tok" in
-			"raw")
+			# Don't pre-process the file at all.
+			# Just set the correct content-type and send the raw data for download
+			"raw"|"dl")
 				OUTPUT_RAW=1
 			;;
 			'hl')
