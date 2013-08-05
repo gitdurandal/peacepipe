@@ -40,7 +40,7 @@ if [ "${QUERY}x" != "x" ]; then
 				OUTPUT_HL=1
 			;;
 			*)
-		esac		
+		esac
 
 		((loops++))
 
@@ -57,13 +57,14 @@ if [ -a "${FILE}" ]; then
 	filename="${FILE%.*}"
 
 	if [ "${OUTPUT_RAW}" = "1" ]; then
+		contentType=`file --mime "${FILE}" | awk '{print $2}' | sed -e "s/;//"`
 		echo -e "Content-Type: $contentType\r\n\r\n"
 		cat "${FILE}"
 		exit 0
 	fi
 
 	case `echo "$extension" | tr '[:upper:]' '[:lower:]'` in
-                        bz2|gz|tgz|zip)
+                        bz2|gz|tgz|zip|tar)
 				subextension="${filename##*.}"
 				outputPipe=""
 
@@ -73,6 +74,8 @@ if [ -a "${FILE}" ]; then
 					tgz) OPENCMD="gunzip -dc";
 						subextension="tar";;
 					zip) OPENCMD="unzip -v";;
+					tar) OPENCMD="cat"
+						subextension="tar";;
 
 					*)
 						exitErr "We don't know what to do here";;
@@ -110,7 +113,7 @@ if [ -a "${FILE}" ]; then
 				exit 0
 				;;
 
-			c|cpp|h|sh|pl|pm|py|diff|vb|vbs)
+			c|cpp|h|sh|pl|pm|py|diff|vb|vbs|php)
 				echo -e "Content-Type: text/html\r\n\r\n"
 				cat "$FILE" | highlight --inline-css --line-number=4 --failsafe -S "${extension}" \
 					-O html --anchors -s night --line-number-ref -T "${bfilename}"
@@ -125,7 +128,7 @@ if [ -a "${FILE}" ]; then
 				exitErr "Unsupported file format $extension for $filename"
 				;;
 
-	esac	
+	esac
 
 
 else
